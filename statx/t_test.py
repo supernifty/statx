@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-  given tumour and normal vcf pairs, explore msi status
+  basic t test
 '''
 
 import argparse
@@ -9,13 +9,27 @@ import sys
 
 import scipy.stats
 
-def main(values1, values2):
+def t_test(values1, values2):
   logging.info('starting: %i values vs %i values', len(values1), len(values2))
   logging.debug('group 1: %s; group 2: %s', ' '.join(values1), ' '.join(values2))
 
-  result = scipy.stats.ttest_ind([float(x) for x in values1], [float(x) for x in values2])
+  if len(values1) == 0 or len(values2) == 0:
+    logging.fatal('empty groups')
+    return
 
-  sys.stdout.write('t-value: {}\np-value: {}\n'.format(result[0], result[1]))
+  num1 = [float(x) for x in values1]
+  num2 = [float(x) for x in values2]
+
+  sys.stdout.write('t-value\tp-value\n')
+
+  if all([num1[0] == x for x in num1 + num2]):
+    logging.info('all values equal')
+    sys.stdout.write('na\t1\n')
+    return
+
+  result = scipy.stats.ttest_ind(num1, num2)
+
+  sys.stdout.write('{}\t{}\n'.format(result[0], result[1]))
 
   logging.info('done')
 
@@ -30,4 +44,4 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  main(args.values1, args.values2)
+  t_test(args.values1, args.values2)
