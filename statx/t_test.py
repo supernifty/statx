@@ -24,7 +24,7 @@ def t_test(values1, values2):
 
   if all([num1[0] == x for x in num1 + num2]):
     logging.info('all values equal')
-    sys.stdout.write('na\t1\n')
+    sys.stdout.write('0\t1\n')
     return
 
   result = scipy.stats.ttest_ind(num1, num2)

@@ -25,7 +25,7 @@ def anova(values1, values2, values3):
 
   if all([num1[0] == x for x in num1 + num2 + num3]):
     logging.info('all values equal')
-    sys.stdout.write('na\t1\n')
+    sys.stdout.write('0\t1\n')
     return
 
   result = scipy.stats.f_oneway(num1, num2, num3)
