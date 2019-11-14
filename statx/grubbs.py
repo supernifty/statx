@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 '''
   grubbs outlier test
+  2 sided
+  divide by two for 1 sided
 '''
 
 import argparse
@@ -10,7 +12,7 @@ import sys
 import numpy as np
 import scipy.stats
 
-def grubbs(value, values):
+def grubbs(value, values, one_sided):
   logging.info('starting: %i values', len(values))
 
   if len(values) <= 1:
@@ -19,19 +21,21 @@ def grubbs(value, values):
 
   nums = [float(x) for x in values]
 
-  sys.stdout.write('sd\tp-value\n')
+  sys.stdout.write('z\tp-value\tv\tvu\tsd\tvmin\tvmax\n')
 
   if all([nums[0] == x for x in nums]):
     logging.info('all values equal')
-    sys.stdout.write('0\t1\n')
+    sys.stdout.write('0\t1\t{}\t{}\t{}\t{}\t{}\n', value, num[0], 0, num[0], num[0])
     return
 
   num = float(value)
   z = (num - np.mean(nums)) / np.std(nums)
-  p = scipy.stats.norm.sf(abs(z))*2
-  
+  p = scipy.stats.norm.sf(abs(z)) * 2
 
-  sys.stdout.write('{}\t{}\n'.format(z, p))
+  if one_sided:
+    p /= 2
+
+  sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(z, p, value, np.mean(nums), np.std(nums), min(nums), max(nums)))
 
   logging.info('done')
 
@@ -39,6 +43,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Grubbs test')
   parser.add_argument('--value', required=True, type=float, help='outlier')
   parser.add_argument('--values', required=True, nargs='+', help='distribution')
+  parser.add_argument('--one_sided', action='store_true', help='one sided test')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
   if args.verbose:
@@ -46,4 +51,4 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  grubbs(args.value, args.values)
+  grubbs(args.value, args.values, args.one_sided)
