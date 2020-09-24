@@ -27,11 +27,11 @@ def t_test(values1, values2, one_sided, paired):
   num1 = [float(x) for x in values1]
   num2 = [float(x) for x in values2]
 
-  sys.stdout.write('t-value\tp-value\tv1u\tv1sd\tv1min\tv1max\tv2u\tv2sd\tv2min\tv2max\n')
+  sys.stdout.write('t-value\tp-value\tv1u\tv1sd\tv1min\tv1max\tv2u\tv2sd\tv2min\tv2max\tn1\tn2\n')
 
   if all([num1[0] == x for x in num1 + num2]):
     logging.info('all values equal')
-    sys.stdout.write('0\t1\t{}\t0\t{}\t{}\t{}\t0\t{}\t{}\n', num1[0], num1[0], num1[0], num1[0], num1[0], num1[0])
+    sys.stdout.write('0\t1\t{}\t0\t{}\t{}\t{}\t0\t{}\t{}\n', num1[0], num1[0], num1[0], num1[0], num1[0], num1[0], len(num1), len(num2))
     return
 
   if paired:
@@ -42,9 +42,9 @@ def t_test(values1, values2, one_sided, paired):
     result = scipy.stats.ttest_ind(num1, num2)
 
   if one_sided:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1), min(num1), max(num1), np.mean(num2), np.std(num2), min(num2), max(num2)))
+    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1), min(num1), max(num1), np.mean(num2), np.std(num2), min(num2), max(num2)))
   else:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1), min(num1), max(num1), np.mean(num2), np.std(num2), min(num2), max(num2)))
+    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1), min(num1), max(num1), np.mean(num2), np.std(num2), min(num2), max(num2), len(num1), len(num2)))
 
   logging.info('done')
 
