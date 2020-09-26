@@ -27,11 +27,11 @@ def t_test(values1, values2, one_sided, paired):
   num1 = [float(x) for x in values1]
   num2 = [float(x) for x in values2]
 
-  sys.stdout.write('t-value\tp-value\tv1u\tv1sd\tv1min\tv1max\tv2u\tv2sd\tv2min\tv2max\n')
+  sys.stdout.write('t-value\tp-value\tv1u\tv1sd\tv1min\tv1max\tv1n\tv2u\tv2sd\tv2min\tv2max\tv2n\n')
 
   if all([num1[0] == x for x in num1 + num2]):
     logging.info('all values equal')
-    sys.stdout.write('0\t1\t{}\t0\t{}\t{}\t{}\t0\t{}\t{}\n', num1[0], num1[0], num1[0], num1[0], num1[0], num1[0])
+    sys.stdout.write('0\t1\t{}\t0\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], len(num2)))
     return
 
   if paired:
@@ -42,14 +42,14 @@ def t_test(values1, values2, one_sided, paired):
     result = scipy.stats.ttest_ind(num1, num2)
 
   if one_sided:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1), min(num1), max(num1), np.mean(num2), np.std(num2), min(num2), max(num2)))
+    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2), min(num2), max(num2), len(num2)))
   else:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1), min(num1), max(num1), np.mean(num2), np.std(num2), min(num2), max(num2)))
+    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2), min(num2), max(num2), len(num2)))
 
   logging.info('done')
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Assess MSI')
+  parser = argparse.ArgumentParser(description='Perform a t-test')
   parser.add_argument('--values1', required=True, nargs='+', help='group 1')
   parser.add_argument('--values2', required=True, nargs='+', help='group 2')
   parser.add_argument('--one_sided', action='store_true', help='one sided result')
