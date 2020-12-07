@@ -42,9 +42,9 @@ def t_test(values1, values2, one_sided, paired):
     result = scipy.stats.ttest_ind(num1, num2)
 
   if one_sided:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2), min(num2), max(num2), len(num2)))
+    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
   else:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2), min(num2), max(num2), len(num2)))
+    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
 
   logging.info('done')
 
@@ -55,9 +55,12 @@ if __name__ == '__main__':
   parser.add_argument('--one_sided', action='store_true', help='one sided result')
   parser.add_argument('--paired', action='store_true', help='one sided test')
   parser.add_argument('--verbose', action='store_true', help='more logging')
+  parser.add_argument('--quiet', action='store_true', help='less logging')
   args = parser.parse_args()
   if args.verbose:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
+  elif args.quiet:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.WARN)
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
