@@ -10,11 +10,8 @@ import numpy as np
 import scipy.stats
 
 def fisher(v):
-  sys.stdout.write('oddsratio\tp-value\n')
   oddsratio, pvalue = scipy.stats.fisher_exact([[v[0], v[1]], [v[2], v[3]]])
-  sys.stdout.write('{}\t{}\n'.format(oddsratio, pvalue))
-
-  logging.info('done')
+  return {'oddsratio': oddsratio, 'pvalue': pvalue}
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Assess MSI')
@@ -26,4 +23,6 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  fisher(args.values)
+  result = fisher(args.values)
+  sys.stdout.write('oddsratio\tp-value\n')
+  sys.stdout.write('{}\t{}\n'.format(result['oddsratio'], result['pvalue']))
