@@ -12,7 +12,7 @@ import sys
 import numpy as np
 import scipy.stats
 
-def t_test(values1, values2, one_sided, paired):
+def t_test(values1, values2, one_sided, paired, output=None):
   logging.info('starting: %i values vs %i values', len(values1), len(values2))
   logging.debug('group 1: %s; group 2: %s', ' '.join(values1), ' '.join(values2))
 
@@ -27,12 +27,14 @@ def t_test(values1, values2, one_sided, paired):
   num1 = [float(x) for x in values1]
   num2 = [float(x) for x in values2]
 
-  sys.stdout.write('t-value\tp-value\tv1u\tv1sd\tv1min\tv1max\tv1n\tv2u\tv2sd\tv2min\tv2max\tv2n\n')
+  if output is not None:
+    output.write('t-value\tp-value\tv1u\tv1sd\tv1min\tv1max\tv1n\tv2u\tv2sd\tv2min\tv2max\tv2n\n')
 
   if all([num1[0] == x for x in num1 + num2]):
     logging.info('all values equal')
-    sys.stdout.write('0\t1\t{}\t0\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], len(num2)))
-    return
+    if output is not None:
+      output.write('0\t1\t{}\t0\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], len(num2)))
+    return (0, 1)
 
   if paired:
     logging.debug('paired test')
@@ -41,12 +43,14 @@ def t_test(values1, values2, one_sided, paired):
     logging.debug('independent test')
     result = scipy.stats.ttest_ind(num1, num2)
 
-  if one_sided:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
-  else:
-    sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
+  if output is not None:
+    if one_sided:
+      output.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1] / 2, np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
+    else:
+      output.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
 
   logging.info('done')
+  return result
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Perform a t-test')
@@ -64,4 +68,4 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  t_test(args.values1, args.values2, args.one_sided, args.paired)
+  t_test(args.values1, args.values2, args.one_sided, args.paired, sys.stdout)
