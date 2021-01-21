@@ -50,7 +50,7 @@ def t_test(values1, values2, one_sided, paired, output=None):
       output.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
 
   logging.info('done')
-  return result
+  return {'p-value': result[1], 't-value': result[0], 'v1u': np.mean(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2sd': np.std(num2, ddof=1)}
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Perform a t-test')
