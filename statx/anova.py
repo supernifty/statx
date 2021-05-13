@@ -10,32 +10,35 @@ import sys
 import scipy.stats
 
 def anova(values1, values2, values3, values4, values5):
-  logging.info('starting: %i values vs %i values vs %i values', len(values1), len(values2), len(values3))
-  logging.debug('group 1: %s; group 2: %s; group 3: %s', ' '.join(values1), ' '.join(values2), ' '.join(values3))
+  logging.info('starting: %i values vs %i...', len(values1), len(values2))
+  logging.debug('group 1: %s; group 2: %s...', ' '.join(values1), ' '.join(values2))
 
-  if len(values1) == 0 or len(values2) == 0 or len(values3) == 0:
+  if len(values1) == 0 or len(values2) == 0:
     logging.fatal('at least one empty group')
     return
 
   num1 = [float(x) for x in values1]
   num2 = [float(x) for x in values2]
-  num3 = [float(x) for x in values3]
 
-  if values4 is None:
-    result = scipy.stats.f_oneway(num1, num2, num3)
-  else: 
-    logging.debug('group 4: %s', ' '.join(values4))
-    num4 = [float(x) for x in values4]
-    if values5 is None:
-      result = scipy.stats.f_oneway(num1, num2, num3, num4)
-    else:
-      logging.debug('group 5: %s', ' '.join(values5))
-      num5 = [float(x) for x in values5]
-      result = scipy.stats.f_oneway(num1, num2, num3, num4, num5)
+  if values3 is None:
+    result = scipy.stats.f_oneway(num1, num2)
+  else:
+    num3 = [float(x) for x in values3]
+    if values4 is None:
+      result = scipy.stats.f_oneway(num1, num2, num3)
+    else: 
+      logging.debug('group 4: %s', ' '.join(values4))
+      num4 = [float(x) for x in values4]
+      if values5 is None:
+        result = scipy.stats.f_oneway(num1, num2, num3, num4)
+      else:
+        logging.debug('group 5: %s', ' '.join(values5))
+        num5 = [float(x) for x in values5]
+        result = scipy.stats.f_oneway(num1, num2, num3, num4, num5)
 
   sys.stdout.write('statistic\tp-value\n')
 
-  if all([num1[0] == x for x in num1 + num2 + num3]):
+  if all([num1[0] == x for x in num1 + num2]):
     logging.info('all values equal')
     sys.stdout.write('0\t1\n')
     return
