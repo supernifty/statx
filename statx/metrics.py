@@ -12,7 +12,7 @@ import numpy as np
 import scipy
 import scipy.stats
 
-
+# clopper-pearson method
 def ci(x, n, alpha=0.05):
   ci_low = scipy.stats.beta.ppf(alpha/2, x, n - x + 1)
   ci_upp = scipy.stats.beta.isf(alpha/2, x + 1, n - x)
