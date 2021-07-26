@@ -21,21 +21,21 @@ def grubbs(value, values, one_sided):
 
   nums = [float(x) for x in values]
 
-  sys.stdout.write('z\tp-value\tv\tvu\tsd\tvmin\tvmax\n')
+  sys.stdout.write('z\tp-value\tv\tvu\tsd\tvmin\tvmax\tn\n')
 
   if all([nums[0] == x for x in nums]):
     logging.info('all values equal')
-    sys.stdout.write('0\t1\t{}\t{}\t{}\t{}\t{}\n', value, num[0], 0, num[0], num[0])
+    sys.stdout.write('0\t1\t{}\t{}\t{}\t{}\t{}\n', value, num[0], 0, num[0], num[0], len(nums))
     return
 
   num = float(value)
-  z = (num - np.mean(nums)) / np.std(nums)
+  z = (num - np.mean(nums)) / np.std(nums, ddof=1)
   p = scipy.stats.norm.sf(abs(z)) * 2
 
   if one_sided:
     p /= 2
 
-  sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(z, p, value, np.mean(nums), np.std(nums), min(nums), max(nums)))
+  sys.stdout.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(z, p, value, np.mean(nums), np.std(nums, ddof=1), min(nums), max(nums), len(nums)))
 
   logging.info('done')
 
