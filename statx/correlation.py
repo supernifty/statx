@@ -4,6 +4,7 @@
 '''
 
 import argparse
+import csv
 import logging
 import sys
 
@@ -34,10 +35,22 @@ def correlation(values1, values2):
 
   logging.info('done')
 
+def read_csv(fh, col1, col2):
+  logging.debug('reading stdin...')
+  values1 = []
+  values2 = []
+  for row in fh:
+    values1.append(row[col1])
+    values2.append(row[col2])
+  correlation(values1, values2)
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Measure correlation')
-  parser.add_argument('--values1', required=True, nargs='+', help='group 1')
-  parser.add_argument('--values2', required=True, nargs='+', help='group 2')
+  parser.add_argument('--values1', required=False, nargs='+', help='group 1')
+  parser.add_argument('--values2', required=False, nargs='+', help='group 2')
+  parser.add_argument('--col1', required=False, help='stdin table')
+  parser.add_argument('--col2', required=False, help='stdin table')
+  parser.add_argument('--delimiter', required=False, default='\t', help='stdin table')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
   if args.verbose:
@@ -45,4 +58,7 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  correlation(args.values1, args.values2)
+  if args.values1 is not None and args.values2 is not None:
+    correlation(args.values1, args.values2)
+  else:
+    read_csv(csv.DictReader(sys.stdin, delimiter=args.delimiter), args.col1, args.col2)
