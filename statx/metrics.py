@@ -35,6 +35,22 @@ def metrics(tp, tn, fp, fn):
   # confidence intervals
   return {'accuracy_pe': accuracy, 'accuracy_lower': accuracy_ci['lower'], 'accuracy_upper': accuracy_ci['upper'], 'sensitivity_pe': sensitivity, 'sensitivity_lower': sensitivity_ci['lower'], 'sensitivity_upper': sensitivity_ci['upper'], 'specificity_pe': specificity, 'specificity_lower': specificity_ci['lower'], 'specificity_upper': specificity_ci['upper']}
 
+def odds_ratio(positives, negatives, base_positives, base_negatives):
+  if negatives > 0 and base_positives > 0:
+    odds = base_positives * base_negatives / base_negatives / base_positives
+  else:
+    return {'odds': 0, 'ci_high': 0, 'ci_low': 0}
+
+  # ci
+  odds = positives * base_negatives / negatives / base_positives
+  logging.debug('odds is %.3f from p %i n %i bp %i bn %i', odds, positives, negatives, base_positives, base_negatives)
+  if odds == 0:
+    ci_high = ci_low = 0
+  else:
+    ci_high = math.exp(math.log(odds) + 1.96 * math.sqrt(1/positives + 1/negatives + 1/base_positives + 1/base_negatives))
+    ci_low = math.exp(math.log(odds) - 1.96 * math.sqrt(1/positives + 1/negatives + 1/base_positives + 1/base_negatives))
+  return {'odds': odds, 'ci_high': ci_high, 'ci_low': ci_low}
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Measure AUC of two groups')
   parser.add_argument('--tp', required=True, type=int, help='true positives')
