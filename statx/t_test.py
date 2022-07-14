@@ -17,8 +17,8 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None):
   logging.debug('group 1: %s; group 2: %s', ' '.join([str(x) for x in num1]), ' '.join([str(x) for x in num2]))
 
   if len(num1) == 0 or len(num2) == 0:
-    logging.fatal('empty groups')
-    return
+    logging.warn('empty groups')
+    return {'p-value': 1, 't-value': 0, 'v1n': len(num1), 'v2n': len(num2)}
 
   if paired and len(num1) != len(num2):
     logging.fatal('paired groups must have same length')
