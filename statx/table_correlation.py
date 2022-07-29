@@ -93,6 +93,18 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
         observed[key] += 1
         expected_x[data[x][idx]] += 1
         expected_y[data[y][idx]] += 1
+
+      # unobserved combinations
+      ks = list(observed.keys())
+      for k in ks:
+        xkey = k[0]
+        for l in ks:
+          ykey = l[1]
+          key = (xkey, ykey)
+          logging.debug('testing %s', key)
+          if key not in observed:
+            logging.debug('adding non-zero for %s', key)
+            observed[key] = 0
   
       total_observed = sum([observed[key] for key in observed])
       current_cs.append(total_observed)
@@ -103,7 +115,15 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
         if equal_categories:
           pvalue = scipy.stats.chisquare(f_obs=[observed[key] for key in sorted(observed.keys())], ddof=ddof)[1]
         else:
-          pvalue = scipy.stats.chisquare(f_obs=[observed[key] for key in sorted(observed.keys())], f_exp=[expected_x[key[0]] * expected_y[key[1]] / total_observed for key in sorted(observed.keys())], ddof=ddof)[1]
+          f_obs=[observed[key] for key in sorted(observed.keys())]
+          f_exp=[expected_x[key[0]] * expected_y[key[1]] / total_observed for key in sorted(observed.keys())]
+          logging.debug('chisquare for total %i observed %s vs expected %s based on observed %s expected_x %s expected_y %s', total_observed, f_obs, f_exp, observed, expected_x, expected_y)
+          try:
+            pvalue = scipy.stats.chisquare(f_obs=f_obs, f_exp=f_exp, ddof=ddof)[1]
+          except:
+            logging.warning('chisquare. something went wrong. for total %i observed %s vs expected %s based on observed %s expected_x %s expected_y %s', total_observed, f_obs, f_exp, observed, expected_x, expected_y)
+            pvalue = -1
+            raise
         current_ds.append(' '.join(['{}/{}={} ({:.2f}%)'.format(key[0], key[1], observed[key], observed[key] / sum([observed[totals] for totals in observed if totals[0] == key[0]]) * 100) for key in sorted(observed.keys())]))
         # calculate odds (only 2x2 with pos/neg for now)
         if len(observed.keys()) == 4 and all([k[0] in POS_NEG and k[1] in POS_NEG for k in observed.keys()]):
