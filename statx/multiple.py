@@ -28,11 +28,11 @@ def main(fh, out, pvalue, target, adjust, delimiter, threshold=0.05):
   adjusted = statsmodels.stats.multitest.fdrcorrection(pvalues)
 
   # write with new column
-  ofh = csv.DictWriter(out, delimiter=delimiter, fieldnames=idr.fieldnames + [adjust])
+  ofh = csv.DictWriter(out, delimiter=delimiter, fieldnames=idr.fieldnames + [target])
   ofh.writeheader()
   adjusted_sig = 0
   for adj, row in zip(adjusted[1], rows):
-    row[adjust] = adj
+    row[target] = adj
     ofh.writerow(row)
     if adj < threshold:
       adjusted_sig += 1
