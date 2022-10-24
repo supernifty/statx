@@ -12,6 +12,7 @@ import scipy.stats
 import sys
 
 import matplotlib
+import matplotlib.cm
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,9 +30,17 @@ def plot(target, xs, zs, dpi, title, figwidth, figheight, cutoff=None):
     ax.set_xticks(np.arange(len(xs)))
     ax.set_yticks(np.arange(len(xs)))
 
+    current_cmap = matplotlib.cm.get_cmap()
+    current_cmap.set_bad(color='#c0c0c0')
+
     im = ax.imshow(zs)
+    # annotate
     for i in range(len(xs)):
       for j in range(len(xs)):
+        if math.isnan(zs[i][j]):
+          text = ax.text(j, i, '-', ha="center", va="center", color="#303030")
+          continue
+
         if cutoff is not None and zs[i][j] < cutoff:
           text = ax.text(j, i, '{:.2f}'.format(zs[i][j]), ha="center", va="center", color="red")
         else:
@@ -50,7 +59,7 @@ def plot(target, xs, zs, dpi, title, figwidth, figheight, cutoff=None):
     plt.savefig(target, dpi=dpi)
 
 
-def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheight=12, figwidth=10, empty=('N/A', ''), equal_categories=False):
+def correlation(fh, cols, delimiter, empty=('N/A', ''), equal_categories=False):
   logging.info('reading stdin...')
   fhr = csv.DictReader(fh, delimiter=delimiter)
   if cols is None:
@@ -61,7 +70,9 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
     for col in row:
       if col in cols:
         data[col].append(row[col])
-
+  return _correlation(data, cols, delimiter, empty, equal_categories)
+ 
+def _correlation(data, cols, delimiter, empty=('N/A', ''), equal_categories=False):
   logging.debug('%i cols included', len(data))
   # process
   xs = []
@@ -71,7 +82,7 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
   ors = []
   bs = []
   zs = []
-  for x in sorted(data.keys()):
+  for x in sorted(data.keys()): # x is each colname
     logging.info('%s...', x)
     xs.append(x)
     current = []
@@ -80,7 +91,7 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
     current_or = [] # details
     current_bs = [] # details
     current_ds = [] # details
-    for y in sorted(data.keys()): # y is colname
+    for y in sorted(data.keys()): # y is each colname
       logging.debug('%s vs %s...', x, y)
       # assume chi-square
       observed = collections.defaultdict(int)
@@ -93,6 +104,17 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
         observed[key] += 1
         expected_x[data[x][idx]] += 1
         expected_y[data[y][idx]] += 1
+
+      # unobserved combinations
+      ks = list(observed.keys())
+      for k in ks:
+        xkey = k[0]
+        for l in ks:
+          ykey = l[1]
+          key = (xkey, ykey)
+          if key not in observed:
+            logging.debug('adding zero for %s', key)
+            observed[key] = 0
   
       total_observed = sum([observed[key] for key in observed])
       current_cs.append(total_observed)
@@ -106,7 +128,12 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
           f_obs=[observed[key] for key in sorted(observed.keys())]
           f_exp=[expected_x[key[0]] * expected_y[key[1]] / total_observed for key in sorted(observed.keys())]
           logging.debug('chisquare for total %i observed %s vs expected %s based on observed %s expected_x %s expected_y %s', total_observed, f_obs, f_exp, observed, expected_x, expected_y)
-          pvalue = scipy.stats.chisquare(f_obs=[observed[key] for key in sorted(observed.keys())], f_exp=[expected_x[key[0]] * expected_y[key[1]] / total_observed for key in sorted(observed.keys())], ddof=ddof)[1]
+          try:
+            pvalue = scipy.stats.chisquare(f_obs=f_obs, f_exp=f_exp, ddof=ddof)[1]
+          except:
+            logging.warning('chisquare. something went wrong. for total %i observed %s vs expected %s based on observed %s expected_x %s expected_y %s', total_observed, f_obs, f_exp, observed, expected_x, expected_y)
+            pvalue = -1
+            raise
         current_ds.append(' '.join(['{}/{}={} ({:.2f}%)'.format(key[0], key[1], observed[key], observed[key] / sum([observed[totals] for totals in observed if totals[0] == key[0]]) * 100) for key in sorted(observed.keys())]))
         # calculate odds (only 2x2 with pos/neg for now)
         if len(observed.keys()) == 4 and all([k[0] in POS_NEG and k[1] in POS_NEG for k in observed.keys()]):
@@ -134,36 +161,38 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
         current_bs.append('')
 
       if math.isnan(pvalue):
-        pvalue = -1
+        pvalue = math.nan #-1
       logging.debug('%s vs %s: %f...', x, y, pvalue)
       current.append(pvalue)
 
-    zs.append(current)
-    cs.append(current_cs)
-    ds.append(current_ds)
-    ts.append(current_ts)
-    ors.append(current_or)
-    bs.append(current_bs)
-    
+    zs.append(current) # pvalues
+    cs.append(current_cs) # counts
+    ds.append(current_ds) # details
+    ts.append(current_ts) # test name
+    ors.append(current_or) # odds ratios
+    bs.append(current_bs) # base variable
+
+  return {'xs': xs, 'zs': zs, 'cs': cs, 'ds': ds, 'ts': ts, 'ors': ors, 'bs': bs}
+
+def write(plot_pvalue, plot_or, dpi, figheight, figwidth, result, out):
   if plot_or is not None:
     lors = []
-    for row in ors:
-      lors.append([math.log(c) if c != np.nan else np.nan for c in row])
-    plot(plot_or, xs, lors, dpi, 'Log odds ratio', figwidth, figheight)
+    for row in result['ors']:
+      lors.append([math.log(c) if c != np.nan and c > 0 else np.nan for c in row])
+    plot(plot_or, result['xs'], lors, dpi, 'Log odds ratio', figwidth, figheight)
 
   if plot_pvalue is not None:
-    plot(plot_pvalue, xs, zs, dpi, 'Correlation p-value', figwidth, figheight, cutoff=0.05)
+    plot(plot_pvalue, result['xs'], result['zs'], dpi, 'Correlation p-value', figwidth, figheight, cutoff=0.05)
 
   if out is not None:
     out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format('x', 'y', 'p', 'or', 'or_base', 'n', 'data'))
-    for x in range(len(xs)):
-      for y in range(len(xs)):
+    for x in range(len(result['xs'])):
+      for y in range(len(result['xs'])):
         if x == y:
           continue
-        out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(xs[x], xs[y], zs[x][y], ors[x][y], bs[x][y], cs[x][y], ds[x][y]))
+        out.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result['xs'][x], result['xs'][y], result['zs'][x][y], result['ors'][x][y], result['bs'][x][y], result['cs'][x][y], result['ds'][x][y]))
 
   logging.info('done')
-  return {'xs': xs, 'zs': zs, 'cs': cs, 'ts': ts, 'ds': ds}
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Run correlation on selecetd columns')
@@ -183,4 +212,5 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  result = correlation(sys.stdin, sys.stdout, args.cols, args.delimiter, args.plot_pvalue, args.plot_or, args.dpi, args.plot_height, args.plot_width, args.empty, args.equal_categories)
+  result = correlation(sys.stdin, args.cols, args.delimiter, args.empty, args.equal_categories)
+  write(args.plot_pvalue, args.plot_or, args.dpi, args.plot_height, args.plot_width, result, sys.stdout)
