@@ -103,6 +103,9 @@ def correlation(fh, out, cols, delimiter, plot_pvalue, plot_or, dpi=300, figheig
         if equal_categories:
           pvalue = scipy.stats.chisquare(f_obs=[observed[key] for key in sorted(observed.keys())], ddof=ddof)[1]
         else:
+          f_obs=[observed[key] for key in sorted(observed.keys())]
+          f_exp=[expected_x[key[0]] * expected_y[key[1]] / total_observed for key in sorted(observed.keys())]
+          logging.debug('chisquare for total %i observed %s vs expected %s based on observed %s expected_x %s expected_y %s', total_observed, f_obs, f_exp, observed, expected_x, expected_y)
           pvalue = scipy.stats.chisquare(f_obs=[observed[key] for key in sorted(observed.keys())], f_exp=[expected_x[key[0]] * expected_y[key[1]] / total_observed for key in sorted(observed.keys())], ddof=ddof)[1]
         current_ds.append(' '.join(['{}/{}={} ({:.2f}%)'.format(key[0], key[1], observed[key], observed[key] / sum([observed[totals] for totals in observed if totals[0] == key[0]]) * 100) for key in sorted(observed.keys())]))
         # calculate odds (only 2x2 with pos/neg for now)
