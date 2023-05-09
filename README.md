@@ -18,3 +18,7 @@ python statx/table.py --cols1 x1 x2 --cols2 y1 y2 y3 --delimiter '	' < example/d
 ```
 python statx/multiple.py --delimiter '   ' --pvalue pvalue --target bh < example/pvalues.tsv
 ```
+
+```
+python statx/multiple_testing.py --verbose --adjustments bonferroni benjamini_hochberg --pvalue pvalue < example/pvalues.tsv
+```
