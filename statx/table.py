@@ -29,6 +29,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Run t_test on each row')
   parser.add_argument('--cols1', required=True, nargs='+', help='colnames')
   parser.add_argument('--cols2', required=True, nargs='+', help='colnames')
+  parser.add_argument('--test', required=False, default='ttest', help='ttest or chi2')
   parser.add_argument('--delimiter', default=',', help='csv input delimiter')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
@@ -37,4 +38,5 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  t_test(sys.stdin, sys.stdout, args.cols1, args.cols2, args.delimiter)
+  if args.test == 'ttest':
+    t_test(sys.stdin, sys.stdout, args.cols1, args.cols2, args.delimiter)

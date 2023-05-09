@@ -31,7 +31,7 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None):
     logging.info('all values equal')
     if output is not None:
       output.write('0\t1\t{}\t0\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], len(num2)))
-    return (0, 1)
+    return {'p-value': 1, 't-value': 0, 'v1u': np.mean(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2sd': np.std(num2, ddof=1)}
 
   if paired:
     logging.debug('paired test')
