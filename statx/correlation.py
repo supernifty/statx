@@ -11,7 +11,7 @@ import sys
 import numpy as np
 import scipy.stats
 
-def correlation(num1, num2, out_fh=None):
+def correlation(num1, num2, out_fh=None, spearman=False):
   logging.info('starting: %i values vs %i values', len(num1), len(num2))
   #logging.debug('group 1: %s; group 2: %s', ' '.join(values1), ' '.join(values2))
 
@@ -28,7 +28,10 @@ def correlation(num1, num2, out_fh=None):
       out_fh.write('0\t1\t{}\t0\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], len(num2)))
     return {'r': 0, 'pvalue': 1}
 
-  result = scipy.stats.pearsonr(num1, num2)
+  if spearman:
+    result = scipy.stats.spearmanr(num1, num2)
+  else:
+    result = scipy.stats.pearsonr(num1, num2)
 
   if out_fh is not None:
     out_fh.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.std(num1), min(num1), max(num1), len(num1), np.mean(num2), np.std(num2), min(num2), max(num2), len(num2)))
@@ -36,14 +39,14 @@ def correlation(num1, num2, out_fh=None):
   logging.info('done')
   return {'r': result[0], 'pvalue': result[1]}
 
-def read_csv(fh, col1, col2, out_fh=None):
+def read_csv(fh, col1, col2, out_fh=None, spearman=False):
   logging.debug('reading stdin...')
   values1 = []
   values2 = []
   for row in fh:
     values1.append(float(row[col1]))
     values2.append(float(row[col2]))
-  return correlation(values1, values2, out_fh)
+  return correlation(values1, values2, out_fh, spearman)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Measure correlation')
@@ -52,6 +55,7 @@ if __name__ == '__main__':
   parser.add_argument('--col1', required=False, help='stdin table')
   parser.add_argument('--col2', required=False, help='stdin table')
   parser.add_argument('--delimiter', required=False, default='\t', help='stdin table')
+  parser.add_argument('--spearman', action='store_true', help='spearman instead of pearson')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
   if args.verbose:
@@ -60,6 +64,6 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
   if args.values1 is not None and args.values2 is not None:
-    correlation(args.values1, args.values2, sys.stdout)
+    correlation(args.values1, args.values2, sys.stdout, args.spearman)
   else:
-    read_csv(csv.DictReader(sys.stdin, delimiter=args.delimiter), args.col1, args.col2, sys.stdout)
+    read_csv(csv.DictReader(sys.stdin, delimiter=args.delimiter), args.col1, args.col2, sys.stdout, args.spearman)
