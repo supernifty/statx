@@ -12,7 +12,7 @@ import scipy.stats
 import statx.t_test
 
 def anova(num1, num2, num3=None, num4=None, num5=None, num6=None, num7=None, out_fh=None):
-  logging.info('starting: %i num vs %i...', len(num1), len(num2))
+  logging.debug('starting: %i num vs %i...', len(num1), len(num2))
 
   if len(num1) == 0 or len(num2) == 0:
     logging.warn('at least one empty group')
@@ -73,7 +73,7 @@ def anova(num1, num2, num3=None, num4=None, num5=None, num6=None, num7=None, out
   if out_fh is not None:
     out_fh.write('{}\t{}\n'.format(result['statistic'], result['pvalue']))
 
-  logging.info('done')
+  logging.debug('done')
   return result
 
 if __name__ == '__main__':

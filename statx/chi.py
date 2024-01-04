@@ -10,6 +10,16 @@ import sys
 import numpy as np
 import scipy.stats
 
+def chisquare(vs):
+  xa = []
+  xb = []
+  for v in range(0, len(vs), 2):
+    xa.append(vs[v])
+    xb.append(vs[v + 1])
+
+  result = scipy.stats.chi2_contingency([xa, xb])
+  return {'oddsratio': 'na', 'pvalue': result.pvalue}
+
 def fisher(v):
   oddsratio, pvalue = scipy.stats.fisher_exact([[v[0], v[1]], [v[2], v[3]]])
   result = {'oddsratio': oddsratio, 'pvalue': pvalue}
@@ -35,6 +45,10 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  result = fisher(args.values)
+  if len(args.values) == 4:
+    result = fisher(args.values)
+  else:
+    # supports yes/no yes/no ...
+    result = chisquare(args.values)
   sys.stdout.write('oddsratio\tp-value\n')
   sys.stdout.write('{}\t{}\n'.format(result['oddsratio'], result['pvalue']))

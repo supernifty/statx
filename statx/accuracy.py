@@ -11,7 +11,7 @@ import sys
 import numpy as np
 import sklearn.metrics
 
-def accuracy(colval, colgroup, a, b, ifh):
+def accuracy(colval, colgroup, a, b, ifh, ci=False):
   if colval is not None:
     a = []
     b = []
@@ -27,7 +27,16 @@ def accuracy(colval, colgroup, a, b, ifh):
   truth = [1] * len(a) + [0] * len(b)
   values = a + b
   auc = sklearn.metrics.roc_auc_score(truth, values)
-  return {'auc': auc}
+  ci_low = ci_high = None
+  if ci and auc < 1 and auc > 0:
+    # based on https://www.ncss.com/wp-content/themes/ncss/pdf/Procedures/PASS/Confidence_Intervals_for_the_Area_Under_an_ROC_Curve.pdf
+    q1 = auc / (2-auc)
+    q2 = 2 * auc * auc / (1 + auc)
+    se = math.sqrt((auc * (1-auc) + (len(a) - 1) * (q1 - auc*auc) + (len(b) - 1) * (q2 - auc*auc)) / (len(a) * len(b)))
+    z = 1.96
+    ci_low = max(0, auc - z * se * auc)
+    ci_high = min(1, auc + z * se * auc)
+  return {'auc': auc, 'ci_low': ci_low, 'ci_high': ci_high}
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Measure AUC of two groups')
