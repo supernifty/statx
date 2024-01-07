@@ -12,7 +12,7 @@ import sys
 import numpy as np
 import scipy.stats
 
-def t_test(num1, num2, one_sided=False, paired=False, output=None):
+def t_test(num1, num2, one_sided=False, paired=False, output=None, non_parametric=False):
   logging.info('starting: %i values vs %i values', len(num1), len(num2))
   logging.debug('group 1: %s; group 2: %s', ' '.join([str(x) for x in num1]), ' '.join([str(x) for x in num2]))
 
@@ -35,10 +35,18 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None):
 
   if paired:
     logging.debug('paired test')
-    result = scipy.stats.ttest_rel(num1, num2)
+    if non_parametric:
+      logging.debug('wilcoxon')
+      result = scipy.stats.wilcoxon(num1, num2)
+    else:
+      result = scipy.stats.ttest_rel(num1, num2)
   else:
     logging.debug('independent test')
-    result = scipy.stats.ttest_ind(num1, num2)
+    if non_parametric:
+      logging.debug('mann whitney u')
+      result = scipy.stats.mannwhitneyu(num1, num2)
+    else:
+      result = scipy.stats.ttest_ind(num1, num2)
 
   if output is not None:
     if one_sided:
@@ -55,6 +63,7 @@ if __name__ == '__main__':
   parser.add_argument('--values2', required=True, nargs='+', type=float, help='group 2')
   parser.add_argument('--one_sided', action='store_true', help='one sided result')
   parser.add_argument('--paired', action='store_true', help='one sided test')
+  parser.add_argument('--non_parametric', action='store_true', help='mann whitney u')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   parser.add_argument('--quiet', action='store_true', help='less logging')
   args = parser.parse_args()
@@ -65,4 +74,4 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  t_test(args.values1, args.values2, args.one_sided, args.paired, sys.stdout)
+  t_test(args.values1, args.values2, args.one_sided, args.paired, sys.stdout, args.non_parametric)
