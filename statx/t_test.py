@@ -13,7 +13,7 @@ import numpy as np
 import scipy.stats
 
 def t_test(num1, num2, one_sided=False, paired=False, output=None, non_parametric=False):
-  logging.info('starting: %i values vs %i values', len(num1), len(num2))
+  logging.debug('starting: %i values vs %i values', len(num1), len(num2))
   logging.debug('group 1: %s; group 2: %s', ' '.join([str(x) for x in num1]), ' '.join([str(x) for x in num2]))
 
   if len(num1) == 0 or len(num2) == 0:
@@ -54,7 +54,7 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None, non_parametri
     else:
       output.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.median(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.median(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
 
-  logging.info('done')
+  logging.debug('done')
   return {'p-value': result[1], 't-value': result[0], 'v1u': np.mean(num1), 'v1median': np.median(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2median': np.median(num2), 'v2sd': np.std(num2, ddof=1), 'v1n': len(num1), 'v2n': len(num2)}
 
 if __name__ == '__main__':

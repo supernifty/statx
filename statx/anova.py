@@ -21,8 +21,8 @@ def anova(num1, num2, num3=None, num4=None, num5=None, num6=None, num7=None, out
   all_equal = True
   numbers = set(num1)
   for x in [num2, num3, num4, num5, num6]:
-    numbers = numbers.union(x)
     if x is not None:
+      numbers = numbers.union(x)
       if len(x) != len(num1):
         logging.debug('good because of lengths %s %s being %i %i', x, num1, len(x), len(num1))
         all_equal = False
@@ -114,9 +114,12 @@ if __name__ == '__main__':
   parser.add_argument('--values7', required=False, nargs='+', type=float, help='group 7')
   parser.add_argument('--non_parametric', action='store_true', help='true for kruskal wallis instead of anova')
   parser.add_argument('--verbose', action='store_true', help='more logging')
+  parser.add_argument('--quiet', action='store_true', help='less logging')
   args = parser.parse_args()
   if args.verbose:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
+  else if args.quiet:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.ERROR)
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
