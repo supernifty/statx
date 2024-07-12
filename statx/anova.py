@@ -118,7 +118,7 @@ if __name__ == '__main__':
   args = parser.parse_args()
   if args.verbose:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.DEBUG)
-  else if args.quiet:
+  elif args.quiet:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.ERROR)
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
