@@ -6,6 +6,7 @@ Measure AUC of two groups
 import argparse
 import csv
 import logging
+import math
 import sys
 
 import numpy as np
@@ -44,6 +45,7 @@ if __name__ == '__main__':
   parser.add_argument('--group2', required=False, type=float, nargs='+', help='controls')
   parser.add_argument('--colval', required=False, help='')
   parser.add_argument('--colgroup', required=False, help='')
+  parser.add_argument('--ci', action='store_true', help='calculate ci')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
   if args.verbose:
@@ -51,5 +53,8 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  a = accuracy(args.colval, args.colgroup, args.group1, args.group2, sys.stdin)
-  sys.stdout.write('{:.6f}'.format(a['auc']))
+  a = accuracy(args.colval, args.colgroup, args.group1, args.group2, sys.stdin, ci=args.ci)
+  if a['ci_low'] is not None:
+    sys.stdout.write('auc\t{:.6f}\nci_low\t{:.6f}\nci_high\t{:.6f}'.format(a['auc'], a['ci_low'], a['ci_high']))
+  else:
+    sys.stdout.write('{:.6f}'.format(a['auc']))
