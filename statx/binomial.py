@@ -23,7 +23,7 @@ def binomial(k, n, p, probability_above, alternative):
   return result
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='chi square')
+  parser = argparse.ArgumentParser(description='binomial test')
   parser.add_argument('--k', required=True, type=int, help='successes')
   parser.add_argument('--n', required=True, type=int, help='trials')
   parser.add_argument('--p', required=True, type=float, help='probability of success')

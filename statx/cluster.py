@@ -45,9 +45,9 @@ def main(ifh, ofh, column, newcolumn, delimiter='\t'):
   logging.info('done')
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Assess MSI')
-  parser.add_argument('--column', required=True, help='tumour vcf')
-  parser.add_argument('--newcolumn', required=True, help='tumour vcf')
+  parser = argparse.ArgumentParser(description='Try to cluster into two groups based on column')
+  parser.add_argument('--column', required=True, help='input column')
+  parser.add_argument('--newcolumn', required=True, help='column name to add specifying predicted cluster')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
   if args.verbose:

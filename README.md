@@ -17,22 +17,67 @@ python statx/accuracy.py --values1 1 2 3 --values2 3 4 5 6
 ```
 
 ## anova.py
+Perform an anova with up to 7 groups.
+
+```
+python statx/anova.py --values1 1 2 3 --values2 3 4 5 6
+```
 
 ## binomial.py
+Applies a binomial test. 
+
+Generates a pvalue, as well as confidence intervals for the probability of success.
+
+```
+python statx/binomial.py --k 10 --n 15 --p 0.4
+```
 
 ## chi.py
+Performs a Fisher exact test (if 4 values), or otherwise a chi-square test
+
+```
+python statx/chi.py --values 13 2 1 10
+```
 
 ## cluster.py
+Try to cluster a column into three groups
+
+```
+python statx/cluster.py --column a --newcolumn b < test/1.tsv
+```
 
 ## correlation.py
+measure pearson or spearman correlation from provided values or columns in a table
+
+```
+statx/correlation.py --values1 1 1 2 4 6 8 --values2 1 2 3 4 5 6
+```
 
 ## correlation_matrix.py
+correlation of each column vs each other column
+```
+python statx/correlation_matrix.py --cols a b c < test/1.tsv
+```
 
 ## distance.py
+cosine distance of every row vs every other row, excluding the specified row which becomes the row's name
+```
+statx/distance.py --name a < test/1.tsv
+```
 
 ## grubbs.py
+statistical test for a point belonging to a specified normal distribution
+
+```
+python statx/grubbs.py --value 12 --values 2 3 4 5 6 7 8 9
+```
 
 ## mann_whitney.py
+Performs a mann whitney U test
+
+```
+python statx/mann_whitney.py --values1 2 3 4 5 6 7 8 9 --values2 7 8 9 10
+```
 
 ## metrics.py
 
