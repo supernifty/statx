@@ -26,9 +26,9 @@ def proportion(values1, values2):
     sys.stdout.write('0\t1\n')
     return
 
-  sys.stdout.write('{}\t{}\n'.format(result[1], result[0]))
+  sys.stdout.write('{}\t{}\n'.format(result[0], result[1]))
 
-  return {'pvalue': result[1], 'statistic': result[0]}
+  return {'pvalue': result[0], 'statistic': result[1]}
 
   logging.info('done')
 

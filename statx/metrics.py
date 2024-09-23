@@ -52,7 +52,7 @@ def odds_ratio(positives, negatives, base_positives, base_negatives):
   return {'odds': odds, 'ci_high': ci_high, 'ci_low': ci_low}
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Measure AUC of two groups')
+  parser = argparse.ArgumentParser(description='Common measures of accuracy based on 2x2 data')
   parser.add_argument('--tp', required=True, type=int, help='true positives')
   parser.add_argument('--tn', required=True, type=int, help='true negative')
   parser.add_argument('--fp', required=True, type=int, help='false positives')

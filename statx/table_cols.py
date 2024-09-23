@@ -13,7 +13,7 @@ import statx.t_test
 def t_test(fh, out, cols1, cols2, delimiter, one_sided=False, paired=False):
   logging.info('reading stdin...')
   fhr = csv.DictReader(fh, delimiter=delimiter)
-  fhout = csv.DictWriter(out, delimiter=delimiter, fieldnames=fhr.fieldnames + ['p-value', 't-value', 'v1u', 'v1sd', 'v2u', 'v2sd'])
+  fhout = csv.DictWriter(out, delimiter=delimiter, fieldnames=fhr.fieldnames + ['p-value', 't-value', 'v1n', 'v1u', 'v1median', 'v1sd', 'v2n', 'v2u', 'v2median', 'v2sd'])
   fhout.writeheader()
   for i, row in enumerate(fhr):
     # def t_test(num1, num2, one_sided=one_sided, paired=paired, output=None):
