@@ -195,7 +195,7 @@ def write(plot_pvalue, plot_or, dpi, figheight, figwidth, result, out):
   logging.info('done')
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser(description='Run correlation on selecetd columns')
+  parser = argparse.ArgumentParser(description='Run correlation on selected columns')
   parser.add_argument('--cols', required=False, nargs='+', help='colnames to include')
   parser.add_argument('--delimiter', default=',', help='csv input delimiter')
   parser.add_argument('--plot_pvalue', required=False, help='plot to filename')

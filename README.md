@@ -122,7 +122,19 @@ python statx/table_cols.py --cols1 x1 x2 --cols2 y1 y2 y3 --delimiter '	' < exam
 ```
 
 ## table_correlation.py
+generate pair-wise chi-square for all specified columns; can also generate heatmaps of pvalues or odds ratios
+
+```
+python statx/table_correlation.py --cols x1 x2 y1 y2 --delimiter '	' < example/data.tsv
+```
+
 ## table_group.py
+makes groups based on one column, with values from another column, then runs a t-test, anova or chi-square
+```
+python statx/table_group.py --group n --col x1 --test t_test --delimiter '	' < example/data.ts
+
+```
+
 ## table_test.py
 ## table_z.py
 

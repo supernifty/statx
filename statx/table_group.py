@@ -34,15 +34,21 @@ def t_test(fh, out, group, col, delimiter, one_sided=False, paired=False):
     result = statx.t_test.t_test([float(x) for x in vals[groups[0]] if x != ''], [float(x) for x in vals[groups[1]] if x != ''], one_sided=one_sided, paired=paired, output=out)
   elif len(groups) == 3: 
     logging.info('comparing 3 groups using column %s with anova', col)
-    result = statx.anova.anova([x for x in vals[groups[0]] if x != ''], [x for x in vals[groups[1]] if x != ''], [x for x in vals[groups[2]] if x != ''], None, None)
+    logging.debug('groups are %s', groups)
+    result = statx.anova.anova([float(x) for x in vals[groups[0]] if x != ''], [float(x) for x in vals[groups[1]] if x != ''], [float(x) for x in vals[groups[2]] if x != ''], None, None)
   elif len(groups) == 4:
     logging.info('comparing 4 groups using column %s with anova', col)
-    result = statx.anova.anova([x for x in vals[groups[0]] if x != ''], [x for x in vals[groups[1]] if x != ''], [x for x in vals[groups[2]] if x != ''], [x for x in vals[groups[3]] if x != ''], None)
+    result = statx.anova.anova([float(x) for x in vals[groups[0]] if x != ''], [float(x) for x in vals[groups[1]] if x != ''], [float(x) for x in vals[groups[2]] if x != ''], [float(x) for x in vals[groups[3]] if x != ''], None)
   elif len(groups) == 5:
     logging.info('comparing 5 groups using column %s with anova', col)
-    result = statx.anova.anova([x for x in vals[groups[0]] if x != ''], [x for x in vals[groups[1]] if x != ''], [x for x in vals[groups[2]] if x != ''], [x for x in vals[groups[3]] if x != ''], [x for x in vals[groups[4]] if x != ''])
+    result = statx.anova.anova([float(x) for x in vals[groups[0]] if x != ''], [float(x) for x in vals[groups[1]] if x != ''], [float(x) for x in vals[groups[2]] if x != ''], [float(x) for x in vals[groups[3]] if x != ''], [float(x) for x in vals[groups[4]] if x != ''])
   else:
     logging.warning('unsupported group size: %i', len(groups))
+
+  odw = csv.DictWriter(out, delimiter=delimiter, fieldnames=['key', 'value'])
+  odw.writeheader()
+  for x in sorted(result):
+    odw.writerow({'key': x, 'value': result[x]})
 
   logging.info('done')
 
