@@ -131,10 +131,18 @@ python statx/table_correlation.py --cols x1 x2 y1 y2 --delimiter '	' < example/d
 ## table_group.py
 makes groups based on one column, with values from another column, then runs a t-test, anova or chi-square
 ```
-python statx/table_group.py --group n --col x1 --test t_test --delimiter '	' < example/data.ts
-
+python statx/table_group.py --group n --col x1 --test t_test --delimiter '	' < example/data.tsv
 ```
 
 ## table_test.py
-## table_z.py
+a simpler version of table_group - uses one column to decide on the groups, another to take the values, but can only deal with two groups (t-test)
+```
+sed '/b/d' < example/data.tsv | python statx/table_test.py --group n --col x1 --test t_test --delimiter '	' 
+```
 
+## table_z.py
+calculates z and p-value for a specified column, based on a given mean and sd
+
+```
+python statx/table_z.py --col x1 --mean 0 --sd 1 < example/data.tsv
+```
