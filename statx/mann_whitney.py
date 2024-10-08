@@ -13,12 +13,12 @@ import numpy as np
 import scipy.stats
 
 def mann_whitney(num1, num2, output):
-  logging.info('starting: %i values vs %i values', len(num1), len(num2))
+  logging.debug('starting: %i values vs %i values', len(num1), len(num2))
   logging.debug('group 1: %s; group 2: %s', ' '.join([str(x) for x in num1]), ' '.join([str(x) for x in num2]))
 
   if len(num1) == 0 or len(num2) == 0:
-    logging.fatal('empty groups')
-    return
+    logging.fatal('at least one empty group')
+    return {'p-value': 1, 'u-value': 0}
 
   if output is not None:
     output.write('u-value\tp-value\tv1u\tv1median\tv1sd\tv1min\tv1max\tv1n\tv2u\tv2median\tv2sd\tv2min\tv2max\tv2n\n')
@@ -27,7 +27,7 @@ def mann_whitney(num1, num2, output):
     logging.info('all values equal')
     if output is not None:
       output.write('0\t1\t{}\t{}\t0\t{}\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], num1[0], len(num2)))
-    return (0, 1)
+    return {'p-value': 1, 'u-value': 0}
 
   result = scipy.stats.mannwhitneyu(num1, num2)
 

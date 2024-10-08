@@ -20,7 +20,11 @@ def main(ifh, ofh, cols, delimiter='\t'):
   count = 0
   for row in csv.DictReader(ifh, delimiter=delimiter):
     for c in cols:
-      data[c].append(float(row[c]))
+      try:
+        data[c].append(float(row[c]))
+      except:
+        logging.warn('column %s contains non-numeric value: %s, row: %s', c, row[c], row)
+        raise
     count += 1
 
   logging.info('calculating from %i...', count)
