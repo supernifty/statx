@@ -137,7 +137,7 @@ python statx/table_group.py --group n --col x1 --test t_test --delimiter '	' < e
 ## table_test.py
 a simpler version of table_group - uses one column to decide on the groups, another to take the values, but can only deal with two groups (t-test)
 ```
-sed '/b/d' < example/data.tsv | python statx/table_test.py --group n --col x1 --test t_test --delimiter '	' 
+sed '/b/d' < example/data.tsv | python statx/table_test.py --key n --val x1
 ```
 
 ## table_z.py

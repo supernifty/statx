@@ -23,7 +23,7 @@ def main(ifh, ofh, cols, delimiter='\t'):
       try:
         data[c].append(float(row[c]))
       except:
-        logging.warn('column %s contains non-numeric value: %s, row: %s', c, row[c], row)
+        logging.warning('column %s contains non-numeric value: %s, row: %s', c, row[c], row)
         raise
     count += 1
 
