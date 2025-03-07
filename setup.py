@@ -14,5 +14,5 @@ setuptools.setup(
     version=version,
     install_requires=['scipy'],
     packages=setuptools.find_packages(),
-    scripts=[i for i in glob('bin/*.py') if "__init__" not in i],
+    scripts=[i for i in glob('statx/*.py') if "__init__" not in i],
 )
