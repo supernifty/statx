@@ -31,7 +31,7 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None, non_parametri
     logging.info('all values equal')
     if output is not None:
       output.write('0\t1\t{}\t0\t{}\t{}\t{}\t{}\t0\t{}\t{}\t{}\n'.format(num1[0], num1[0], num1[0], len(num1), num1[0], num1[0], num1[0], len(num2)))
-    return {'p-value': 1, 't-value': 0, 'v1u': np.mean(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2sd': np.std(num2, ddof=1)}
+    return {'p-value': 1, 't-value': 0, 'v1u': np.mean(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2sd': np.std(num2, ddof=1), 'v1min': num1[0], 'v1max': num1[0], 'v2min': num1[0], 'v2max': num1[0]}
 
   if paired:
     logging.debug('paired test')
@@ -55,7 +55,7 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None, non_parametri
       output.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(result[0], result[1], np.mean(num1), np.median(num1), np.std(num1, ddof=1), min(num1), max(num1), len(num1), np.mean(num2), np.median(num2), np.std(num2, ddof=1), min(num2), max(num2), len(num2)))
 
   logging.debug('done')
-  return {'p-value': result[1], 't-value': result[0], 'v1u': np.mean(num1), 'v1median': np.median(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2median': np.median(num2), 'v2sd': np.std(num2, ddof=1), 'v1n': len(num1), 'v2n': len(num2)}
+  return {'p-value': result[1], 't-value': result[0], 'v1u': np.mean(num1), 'v1median': np.median(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2median': np.median(num2), 'v2sd': np.std(num2, ddof=1), 'v1n': len(num1), 'v2n': len(num2), 'v1min': min(num1), 'v1max': max(num1), 'v2min': min(num2), 'v2max': max(num2)}
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Perform a t-test')

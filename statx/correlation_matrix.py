@@ -30,14 +30,21 @@ def main(ifh, ofh, cols, delimiter='\t'):
   logging.info('calculating from %i...', count)
   correlations = []
 
-  odw = csv.DictWriter(ofh, delimiter='\t', fieldnames=['x', 'y', 'correlation', 'pvalue'])
+  odw = csv.DictWriter(ofh, delimiter='\t', fieldnames=['x', 'y', 'correlation', 'pvalue', 'intercept', 'gradient'])
   odw.writeheader()
   for x in cols:
     for y in cols:
       if x == y:
         continue
+      if len(data[x]) != len(data[y]):
+        logging.warning('%s has %i data points and %s has %i data points: skipping.', x, len(data[x]), y, len(data[y]))
+        continue
+      if len(data[x]) < 2 or  len(data[y]) < 2:
+        logging.warning('%s has %i data points and %s has %i data points: skipping.', x, len(data[x]), y, len(data[y]))
+        continue
       result = scipy.stats.pearsonr(data[x], data[y])
-      odw.writerow({'x': x, 'y': y, 'correlation': '{:.3f}'.format(result[0]), 'pvalue': result[1]})
+      res = scipy.stats.linregress(data[x], data[y])
+      odw.writerow({'x': x, 'y': y, 'correlation': '{:.3f}'.format(result[0]), 'pvalue': result[1], 'intercept': res.intercept, 'gradient': res.slope})
       correlations.append(result[0])
 
   logging.info('correlation mean: %.6f sd: %.6f', np.mean(correlations), np.std(correlations, ddof=1))
