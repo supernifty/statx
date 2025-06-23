@@ -43,8 +43,12 @@ def main(ifh, ofh, cols, delimiter='\t'):
         logging.warning('%s has %i data points and %s has %i data points: skipping.', x, len(data[x]), y, len(data[y]))
         continue
       result = scipy.stats.pearsonr(data[x], data[y])
-      res = scipy.stats.linregress(data[x], data[y])
-      odw.writerow({'x': x, 'y': y, 'correlation': '{:.3f}'.format(result[0]), 'pvalue': result[1], 'intercept': res.intercept, 'gradient': res.slope})
+      try:
+        res = scipy.stats.linregress(data[x], data[y])
+        odw.writerow({'x': x, 'y': y, 'correlation': '{:.3f}'.format(result[0]), 'pvalue': result[1], 'intercept': res.intercept, 'gradient': res.slope})
+      except ValueError:
+        odw.writerow({'x': x, 'y': y, 'correlation': '{:.3f}'.format(result[0]), 'pvalue': result[1], 'intercept': 0, 'gradient': 0})
+        logging.warning('regression failed. are all values the same?')
       correlations.append(result[0])
 
   logging.info('correlation mean: %.6f sd: %.6f', np.mean(correlations), np.std(correlations, ddof=1))
