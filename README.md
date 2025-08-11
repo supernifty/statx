@@ -133,6 +133,12 @@ makes groups based on one column, with values from another column, then runs a t
 ```
 python statx/table_group.py --group n --col x1 --test t_test --delimiter '	' < example/data.tsv
 ```
+## table_groups.py
+run a table_group test against multiple columns
+
+```
+python statx/table_groups.py --group n --cols x1 x2 --test t_test --delimiter '	' < example/data.tsv
+```
 
 ## table_test.py
 a simpler version of table_group - uses one column to decide on the groups, another to take the values, but can only deal with two groups (t-test)
