@@ -13,13 +13,14 @@ import numpy as np
 
 import scipy.stats
 
-def main(ifh, ofh, cols, delimiter='\t'):
+def main(ifh, ofh, cols, cols2=None, delimiter='\t'):
   logging.info('reading...')
   data = collections.defaultdict(list)
   # want sig: [vals]
   count = 0
+  all_cols = cols + (cols2 or [])
   for row in csv.DictReader(ifh, delimiter=delimiter):
-    for c in cols:
+    for c in all_cols:
       try:
         data[c].append(float(row[c]))
       except:
@@ -33,7 +34,7 @@ def main(ifh, ofh, cols, delimiter='\t'):
   odw = csv.DictWriter(ofh, delimiter='\t', fieldnames=['x', 'y', 'correlation', 'pvalue', 'intercept', 'gradient'])
   odw.writeheader()
   for x in cols:
-    for y in cols:
+    for y in cols2 or cols:
       if x == y:
         continue
       if len(data[x]) != len(data[y]):
@@ -56,7 +57,8 @@ def main(ifh, ofh, cols, delimiter='\t'):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='matrix')
-  parser.add_argument('--cols', required=True, nargs='+', help='tumour vcf')
+  parser.add_argument('--cols', required=True, nargs='+', help='columns to include')
+  parser.add_argument('--cols2', required=False, nargs='+', help='separate set of columns if not all v all')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   args = parser.parse_args()
   if args.verbose:
@@ -64,4 +66,4 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  main(sys.stdin, sys.stdout, args.cols)
+  main(sys.stdin, sys.stdout, args.cols, args.cols2)
