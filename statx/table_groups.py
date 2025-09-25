@@ -9,6 +9,7 @@ import csv
 import logging
 import sys
 
+import statx.anova
 import statx.t_test
 
 def t_test(fh, out, group, cols, delimiter, one_sided=False, paired=False):
@@ -24,8 +25,8 @@ def t_test(fh, out, group, cols, delimiter, one_sided=False, paired=False):
       data[c][r[group]].append(float(r[c]))
       groups.add(r[group])
 
-  if len(groups) != 2:
-    logging.fatal('only t-tests for now but there are %i groups', len(groups))
+  if len(groups) < 2 or len(groups) > 5:
+    logging.fatal('only t-tests and anova for now but there are %i groups', len(groups))
     sys.exit(1)
     
   fhout = csv.DictWriter(out, delimiter=delimiter, fieldnames=['col', 'p-value', 't-value', 'v1n', 'v1u', 'v1median', 'v1sd', 'v2n', 'v2u', 'v2median', 'v2sd', 'v1max', 'v2min', 'v1min', 'v2max'])
@@ -33,7 +34,11 @@ def t_test(fh, out, group, cols, delimiter, one_sided=False, paired=False):
   g = sorted(list(groups))
   for c in cols:
     logging.debug('processing %s...', c)
-    result = statx.t_test.t_test(data[c][g[0]], data[c][g[1]], one_sided=one_sided, paired=paired)
+    if len(groups) == 2:
+      result = statx.t_test.t_test(data[c][g[0]], data[c][g[1]], one_sided=one_sided, paired=paired)
+    else: # at least 3
+      raw = statx.anova.anova(data[c][g[0]], data[c][g[1]], data[c][g[2]], None if len(groups) < 4 else data[c][g[3]], None if len(groups) < 5 else data[c][g[4]]) 
+      result = {'t-value': raw['statistic'], 'p-value': raw['pvalue']}
     result['col'] = c
     fhout.writerow(result)
 
