@@ -22,10 +22,20 @@ def t_test(fh, out, group, cols, delimiter, one_sided=False, paired=False):
     data[c] = collections.defaultdict(list)
 
   groups = set()
+  bad_cols = set()
   for i, r in enumerate(fhr):
     for c in cols:
-      data[c][r[group]].append(float(r[c]))
+      try:
+        data[c][r[group]].append(float(r[c]))
+      except:
+        bad_cols.add(c)
       groups.add(r[group])
+
+  if len(bad_cols) > 0:
+    logging.warning('skipping %i cols: %s', len(bad_cols), bad_cols)
+    for c in bad_cols:
+      del data[c]
+      cols.remove(c)
 
   if len(groups) < 2 or len(groups) > 5:
     logging.fatal('only t-tests and anova for now but there are %i groups: %s', len(groups), groups)
