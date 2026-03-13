@@ -133,6 +133,22 @@ makes groups based on one column, with values from another column, then runs a t
 ```
 python statx/table_group.py --group n --col x1 --test t_test --delimiter '	' < example/data.tsv
 ```
+
+## table_group_multi.py
+For each group value and each specified column, performs a t-test comparing values from that group versus all other groups combined. Outputs a summary table with means, standard deviations, p-values, and significance stars (*** p<0.001, ** p<0.01, * p<0.05).
+
+```
+python statx/table_group_multi.py --group n --cols x1 x2 y1 --delimiter '	' < example/data.tsv
+```
+
+Example output:
+```
+group	col	group_mean	col_mean	group_sd	col_sd	p_value	significant
+a	x1	0.500000	7.400000	0.707107	4.219005	0.081335	
+a	y1	0.000000	7.000000	0.000000	2.738613	0.018927	*
+c	x1	10.333333	1.750000	1.527525	1.707825	0.001006	**
+```
+
 ## table_groups.py
 run a table_group test against multiple columns
 
