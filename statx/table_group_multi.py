@@ -39,7 +39,7 @@ def table_group_multi(fh, out, group, cols, delimiter):
   logging.info('found %i groups: %s', len(groups), groups)
   
   # Write header
-  out.write('group\tcol\tgroup_mean\tcol_mean\tgroup_sd\tcol_sd\tp_value\tsignificant\tdirection\n')
+  out.write('group\tcol\tgroup_n\tcol_n\tgroup_mean\tcol_mean\tgroup_sd\tcol_sd\tp_value\tsignificant\tdirection\n')
   
   # For each group and column, perform t-test
   for grp in groups:
@@ -70,6 +70,8 @@ def table_group_multi(fh, out, group, cols, delimiter):
       col_mean = np.mean(other_values)
       col_sd = np.std(other_values, ddof=1)
       p_value = result['p-value']
+      group_n = len(group_values)
+      col_n = len(other_values)
       
       # Significance stars: *** p<0.001, ** p<0.01, * p<0.05
       if p_value < 0.001:
@@ -90,8 +92,8 @@ def table_group_multi(fh, out, group, cols, delimiter):
       else:
         p_value_str = '{:.6f}'.format(p_value)
       
-      out.write('{}\t{}\t{:.6f}\t{:.6f}\t{:.6f}\t{:.6f}\t{}\t{}\t{}\n'.format(
-        grp, col, group_mean, col_mean, group_sd, col_sd, p_value_str, significant, direction
+      out.write('{}\t{}\t{}\t{}\t{:.6f}\t{:.6f}\t{:.6f}\t{:.6f}\t{}\t{}\t{}\n'.format(
+        grp, col, group_n, col_n, group_mean, col_mean, group_sd, col_sd, p_value_str, significant, direction
       ))
   
   logging.info('done')
