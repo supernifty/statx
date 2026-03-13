@@ -39,7 +39,7 @@ def table_group_multi(fh, out, group, cols, delimiter):
   logging.info('found %i groups: %s', len(groups), groups)
   
   # Write header
-  out.write('group\tcol\tgroup_mean\tcol_mean\tgroup_sd\tcol_sd\tp_value\tsignificant\n')
+  out.write('group\tcol\tgroup_mean\tcol_mean\tgroup_sd\tcol_sd\tp_value\tsignificant\tdirection\n')
   
   # For each group and column, perform t-test
   for grp in groups:
@@ -81,8 +81,17 @@ def table_group_multi(fh, out, group, cols, delimiter):
       else:
         significant = ''
       
-      out.write('{}\t{}\t{:.6f}\t{:.6f}\t{:.6f}\t{:.6f}\t{:.6f}\t{}\n'.format(
-        grp, col, group_mean, col_mean, group_sd, col_sd, p_value, significant
+      # Direction: positive if group has higher mean, otherwise negative
+      direction = 'positive' if group_mean > col_mean else 'negative'
+      
+      # Format p_value: use scientific notation for very small values
+      if p_value < 0.00001:
+        p_value_str = '{:.2e}'.format(p_value)
+      else:
+        p_value_str = '{:.6f}'.format(p_value)
+      
+      out.write('{}\t{}\t{:.6f}\t{:.6f}\t{:.6f}\t{:.6f}\t{}\t{}\t{}\n'.format(
+        grp, col, group_mean, col_mean, group_sd, col_sd, p_value_str, significant, direction
       ))
   
   logging.info('done')
