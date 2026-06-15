@@ -114,6 +114,12 @@ Perform a t-test
 python statx/t_test.py --values1 1 2 3 --values2 3 4 5 6
 ```
 
+It can also read two columns from a delimited table on stdin. Use `--paired` for a paired t-test.
+
+```
+python statx/t_test.py --col1 x1 --col2 x2 --paired --delimiter '	' < example/data.tsv
+```
+
 ## table_cols.py
 performs a t-test row by row for the specified columns
 

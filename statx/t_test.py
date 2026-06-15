@@ -6,6 +6,7 @@
 '''
 
 import argparse
+import csv
 import logging
 import sys
 
@@ -57,13 +58,43 @@ def t_test(num1, num2, one_sided=False, paired=False, output=None, non_parametri
   logging.debug('done')
   return {'p-value': result[1], 't-value': result[0], 'v1u': np.mean(num1), 'v1median': np.median(num1), 'v1sd': np.std(num1, ddof=1), 'v2u': np.mean(num2), 'v2median': np.median(num2), 'v2sd': np.std(num2, ddof=1), 'v1n': len(num1), 'v2n': len(num2), 'v1min': min(num1), 'v1max': max(num1), 'v2min': min(num2), 'v2max': max(num2)}
 
+def read_csv(fh, col1, col2, out_fh=None, one_sided=False, paired=False, non_parametric=False):
+  logging.debug('reading stdin...')
+  values1 = []
+  values2 = []
+  skipped = 0
+  for row in fh:
+    val1 = row[col1]
+    val2 = row[col2]
+    if paired:
+      if val1 == '' or val2 == '':
+        skipped += 1
+        continue
+      values1.append(float(val1))
+      values2.append(float(val2))
+    else:
+      if val1 != '':
+        values1.append(float(val1))
+      if val2 != '':
+        values2.append(float(val2))
+      if val1 == '' or val2 == '':
+        skipped += 1
+
+  if skipped > 0:
+    logging.warning('skipped %i rows with missing values', skipped)
+
+  return t_test(values1, values2, one_sided, paired, out_fh, non_parametric)
+
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Perform a t-test')
-  parser.add_argument('--values1', required=True, nargs='+', type=float, help='group 1')
-  parser.add_argument('--values2', required=True, nargs='+', type=float, help='group 2')
+  parser.add_argument('--values1', required=False, nargs='+', type=float, help='group 1')
+  parser.add_argument('--values2', required=False, nargs='+', type=float, help='group 2')
+  parser.add_argument('--col1', required=False, help='stdin table column for group 1')
+  parser.add_argument('--col2', required=False, help='stdin table column for group 2')
+  parser.add_argument('--delimiter', required=False, default='\t', help='stdin table delimiter')
   parser.add_argument('--one_sided', action='store_true', help='one sided result')
-  parser.add_argument('--paired', action='store_true', help='one sided test')
-  parser.add_argument('--non_parametric', action='store_true', help='mann whitney u')
+  parser.add_argument('--paired', action='store_true', help='paired test')
+  parser.add_argument('--non_parametric', action='store_true', help='mann whitney u or wilcoxon if paired')
   parser.add_argument('--verbose', action='store_true', help='more logging')
   parser.add_argument('--quiet', action='store_true', help='less logging')
   args = parser.parse_args()
@@ -74,4 +105,9 @@ if __name__ == '__main__':
   else:
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
 
-  t_test(args.values1, args.values2, args.one_sided, args.paired, sys.stdout, args.non_parametric)
+  if args.values1 is not None and args.values2 is not None:
+    t_test(args.values1, args.values2, args.one_sided, args.paired, sys.stdout, args.non_parametric)
+  elif args.col1 is not None and args.col2 is not None:
+    read_csv(csv.DictReader(sys.stdin, delimiter=args.delimiter), args.col1, args.col2, sys.stdout, args.one_sided, args.paired, args.non_parametric)
+  else:
+    parser.error('provide either --values1/--values2 or --col1/--col2')
